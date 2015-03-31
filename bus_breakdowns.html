@@ -2,15 +2,15 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <script src="d3.js">
+  <script src="d3.min.js">
     // Gives access to D3 methods
   </script>
   <style>
     // Styles that override external CSS go here
-    .axis path, .axis line {
+    .axis path{
       fill:none;
       stroke:black;
-      stroke-width:0.5px;
+      stroke-width:1px;
       shape-rendering:crispEdges;
       }
     .axis text {
@@ -32,10 +32,12 @@
     // A draw() function that visualises passed data
     function draw(data) {
       "use strict"; // We want to satisfy JSLint
+
       // Set up viewport
       var margin = 50,
           width = 700,
           height = 300;
+
       // Select the BODY, add an SVG element, and add a circle 
       // for each datapoint
       d3.select("body")
@@ -46,6 +48,7 @@
         .data(data)
         .enter()
         .append("circle");
+
       // Use a scale object to map the data domain onto the 
       // visualisation output range. The d3.extent() function
       // returns max and min values of a dataset argument, and
@@ -59,6 +62,7 @@
       var x_scale = d3.scale.linear()
                       .range([margin, width-margin])
                       .domain(x_extent)
+
       // We do something similar for the y-axis. Note that the
       // output range is decreasing (from high values to low), with
       // increasing (low to high) domain data, due to the origin
@@ -69,6 +73,7 @@
       var y_scale = d3.scale.linear()
                       .range([height-margin, margin])
                       .domain(y_extent)
+
       // Layout circles, one per datapoint, using the x- and y-
       // scales. A radius must be specified to render them.
       d3.selectAll("circle")
@@ -80,6 +85,7 @@
                         });
       d3.selectAll("circle")
           .attr("r", 5);
+
       // Add x axis. Using the x_scale object we created
       // sets values and limits automagically.
       // The resulting x_axis object still has to be called, and moved
@@ -93,6 +99,7 @@
           .attr("class", "x axis")
           .attr("transform", "translate(0," + (height-margin) + ")")
         .call(x_axis)
+
       // Add y axis also
       var y_axis = d3.svg.axis().scale(y_scale).orient("left");
       d3.select("svg")
@@ -100,6 +107,22 @@
           .attr("class", "y axis")
           .attr("transform", "translate(" + (margin) + ",0)")
         .call(y_axis)
+
+      // Add x-axis label. Select x-axis group, append a text
+      // element and specify content directly, as well as co-ords
+      // relative to top-left of group element.
+      d3.select(".x.axis")
+        .append("text")
+          .text("collisions with injury (per million miles)")
+          .attr("x", (width / 2) - margin)
+          .attr("y", margin / 1.5);
+
+      // Add y-axis lavel. This requires us to rotate text,
+      // as well as transform it.
+      d3.select(".y.axis")
+        .append("text")
+          .text("mean distance between failure (miles)")
+          .attr("transform", "rotate (-90, -43, 0) translate(-280)");
     }
     </script>
 </head>
