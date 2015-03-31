@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="d3.js">
+    // Gives access to D3 methods
+  </script>
+  <script>
+    // A draw() function that visualises passed data
+    function draw(data) {
+      "use strict"; // We want to satisfy JSLint
+      // Method-chaining: each method returns a selection which,
+      // in turn, has methods that return a selection.
+      // Select the BODY, append an unnumbered list, then
+      // select all list elements on the page (there aren't any,
+      // so this is an empty selection that has a .data() method
+      // which lets us enter data.
+      // The .data() method JOINs the empty selection with every
+      // element in the dataset: so there's an array with as many
+      // elements as datapoints. The .enter() method then returns 
+      // a selection whose array contains the data for all new
+      // elements (those that do not exist on the page). An <li>
+      // element is appended to (each datapoint in) the enter
+      // selection, and its contents are assigned with the
+      // .text() method.
+      // A callback function is needed as the argument to .text()
+      // and, for this example, we just concatenate the name and 
+      // status attributes.
+      d3.select("body")
+        .append("ul")
+        .selectAll("li")
+        .data(data)
+        .enter()
+        .append("li")
+          .text(function (d) {
+            return d.name + ": " + d.status;
+          });
+    }
+    </script>
+</head>
+<body>
+  <script>
+    // Make an HTTP GET request to a JSON file at the URL,
+    // then call the function draw() with that data
+    d3.json("data/service_status.json", draw);
+  </script>
+</body>
+</html>
