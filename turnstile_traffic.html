@@ -25,11 +25,17 @@
       stroke:black;
       stroke-width:0.5px;
     }
-    circle.times_square{
+    circle.times_square {
       fill:DeepPink;
     }
-    circle.grand_central{
-      fill.MediumSeaGreen;
+    circle.grand_central {
+      fill:MediumSeaGreen;
+    }
+    path.times_square {
+      stroke:DeepPink;
+    }
+    path.grand_central {
+      stroke:MediumSeaGreen;
     }
   </style>
   <script>
@@ -112,6 +118,22 @@
           .attr("class", "y axis")
           .attr("transform", "translate(" + margin + ",0)")
           .call(count_axis);
+
+      // Add paths for time series
+      // The line() path generator produces paths from x and y data.
+      // The new line object can be called like a function, specifying
+      // a dataset as "d", which will be scaled using our two scales.
+      var line = d3.svg.line()
+                       .x(function (d) {return time_scale(d.time)})
+                       .y(function (d) {return count_scale(d.count)});
+      d3.select("svg")
+        .append("path")
+          .attr("d", line(data.times_square))
+          .attr("class", "times_square");
+      d3.select("svg")
+        .append("path")
+          .attr("d", line(data.grand_central))
+          .attr("class", "grand_central");
     }
     </script>
 </head>
