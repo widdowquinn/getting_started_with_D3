@@ -13,6 +13,7 @@
     }
     .axis path, line {
       stroke:black;
+      stroke-width:1px;
     }
     .line {
       float:left;
@@ -41,8 +42,15 @@
     #timeseries {
       float:left;
     }
+    .timeseries path{
+      stroke:black;
+      stroke-width:1px;
+    }
   </style>
   <script>
+    // Make the axes scales global
+    var time_scale, percent_scale;
+
     // A draw() function that visualises passed data
     function draw(data) {
       "use strict"; // We want to satisfy JSLint
@@ -70,15 +78,16 @@
     
       // Set up scales and axes - manually set the scale domains, rather than
       // use data set extents (we know these ahead of time, and need to frame
-      // time series consistently)
-      var time_scale = d3.time.scale()
-                         .range([0, chart_dimensions.width])
-                         .domain([new Date(2008, 0, 1), new Date(2011, 3, 1)]);
+      // time series consistently). As time_scale and percent_scale have been
+      // declared globally, they do not need the var keyword, here.
+      time_scale = d3.time.scale()
+                     .range([0, chart_dimensions.width])
+                     .domain([new Date(2009, 0, 1), new Date(2011, 3, 1)]);
       var time_axis = d3.svg.axis()
                             .scale(time_scale);
-      var percent_scale = d3.scale.linear()
-                            .range([chart_dimensions.height, 0])
-                            .domain([65, 90]);
+      percent_scale = d3.scale.linear()
+                        .range([chart_dimensions.height, 0])
+                        .domain([65, 90]);
       var count_axis = d3.svg.axis()
                          .scale(percent_scale)
                          .orient("left");
@@ -107,7 +116,7 @@
                         .append("div")
                           .attr("class", "key_line")
                           .attr("id", function (d) {
-                                         return d.line_id
+                                         return d.line_id + "_key"
                                          });
        // Then hang further elements from key_line elements, with
        // unique IDs
@@ -121,6 +130,57 @@
                    .text(function (d) {
                            return d.line_name
                            });
+
+       // Add click event handler to each .key_line element. This will
+       // call get_timeseries_data() to toggle the timeseries plot on
+       // and off, for that line.
+       // If the line is not drawn, then ts.empty() returns True
+       // ts.remove will remove all elements in the timeseries plot ts.
+       d3.selectAll(".key_line")
+           .on("click", get_timeseries_data);
+    }
+
+    // Callback function that checks whether a line exists on the
+    // chart, and filters the JSON data accordingly
+    function get_timeseries_data(d, i) {
+      // Get id of current element
+      var id = d.line_id
+      console.log("get_timeseries_data() " + id)
+      // Is there an associated timeseries plot?
+      var ts = d3.select("#" + id);
+      if (ts.empty()) {
+        d3.json("data/subway_wait.json", function(data) {
+                   filtered_data = data.filter(function (d) {
+                                              return d.line_id === id});
+                   draw_timeseries(filtered_data, id);
+                   })
+      } else {
+        ts.remove();
+      }
+    }
+
+    // Function to draw timeseries data
+    function draw_timeseries(data, id) {
+      console.log(id)
+      // Path generator for timeseries
+      var line = d3.svg.line()
+                       .x(function (d) {
+                            return time_scale(d.time)
+                            })
+                       .y(function (d) {
+                            return percent_scale(d.late_percent)
+                            })
+                       .interpolate("linear");
+
+      // Add a new element to the chart, for this timeseries
+      var g = d3.select("#chart")
+                .append("g")
+                  .attr("id", id)
+                  .attr("class", "timeseries " + id);
+
+      // Add the path to the new timeseries element
+      g.append("path")
+         .attr("d", line(data));
     }
   </script>
 </head>
