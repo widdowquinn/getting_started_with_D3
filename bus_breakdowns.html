@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="d3.js">
+    // Gives access to D3 methods
+  </script>
+  <style>
+    // Styles that override external CSS go here
+  </style>
+  <script>
+    // A draw() function that visualises passed data
+    function draw(data) {
+      "use strict"; // We want to satisfy JSLint
+      // Set up viewport
+      var margin = 50,
+          width = 700,
+          height = 300;
+      // Select the BODY, add an SVG element, and add a circle 
+      // for each datapoint
+      d3.select("body")
+        .append("svg")
+          .attr("width", width)
+          .attr("height", height)
+        .selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle");
+      // Use a scale object to map the data domain onto the 
+      // visualisation output range. The d3.extent() function
+      // returns max and min values of a dataset argument, and
+      // from this we can build a scale with .scale.linear().
+      // Once constructed, this maps values from the minimum and
+      // maximum of the input data to the [margin, width-margin]
+      // visualisation limits.
+      var x_extent = d3.extent(data, function (d) {
+                                       return d.collision_with_injury
+                                       });
+      var x_scale = d3.scale.linear()
+                      .range([margin, width-margin])
+                      .domain(x_extent)
+      // We do something similar for the y-axis. Note that the
+      // output range is decreasing (from high values to low), with
+      // increasing (low to high) domain data, due to the origin
+      // location of SVG being at the top left.
+      var y_extent = d3.extent(data, function (d) {
+                                       return d.dist_between_fail
+                                       });
+      var y_scale = d3.scale.linear()
+                      .range([height-margin, margin])
+                      .domain(y_extent)
+      // Layout circles, one per datapoint, using the x- and y-
+      // scales. A radius must be specified to render them.
+      d3.selectAll("circle")
+          .attr("cx", function (d) {
+                        return x_scale(d.collision_with_injury)
+                        })
+          .attr("cy", function (d) {
+                        return y_scale(d.dist_between_fail)
+                        });
+      d3.selectAll("circle")
+          .attr("r", 5);
+    }
+    </script>
+</head>
+<body>
+  <script>
+    // Make an HTTP GET request to a JSON file at the URL,
+    // then call the function draw() with that data
+    d3.json("data/bus_perf.json", draw);
+  </script>
+</body>
+</html>
