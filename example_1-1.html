@@ -2,10 +2,11 @@
 <html>
 <head>
   <meta charset="utf-8">
-  // Gives access to D3 methods
-  <script src="d3.js"></script>
-  // A draw() function that visualises passed data
+  <script src="d3.js">
+    // Gives access to D3 methods
+  </script>
   <script>
+    // A draw() function that visualises passed data
     function draw(data) {
       "use strict"; // We want to satisfy JSLint
       // Visualisation code
@@ -13,9 +14,9 @@
     </script>
 </head>
 <body>
-  // Make an HTTP GET request to a JSON file at the URL,
-  // then call the function draw() with that data
   <script>
+    // Make an HTTP GET request to a JSON file at the URL,
+    // then call the function draw() with that data
     d3.json("data/some_data.json", draw);
   </script>
 </body>
