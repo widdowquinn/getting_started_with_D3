@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="d3.js">
+    // Gives access to D3 methods
+  </script>
+  <script>
+    // A draw() function that visualises passed data
+    function draw(data) {
+      "use strict"; // We want to satisfy JSLint
+      // Method-chaining: each method returns a selection which,
+      // in turn, has methods that return a selection.
+      // Select the BODY, and append a <div>, whose class is 
+      // "chart" - the styles relevant to charts can then be
+      // selected and applied.
+      // The .selectAll() of "bar" is an empty selection that 
+      // is joined to the data (data.cash), with one element
+      // per datapoint.
+      // The <div> tags of class "bar" are appended, with width
+      // and text elements defined according to the callbacks, 
+      // and these are operating on the data's count property.
+      // Scaling is kind of ad hoc, dividing the values through
+      // by 100.
+      d3.select("body")
+        .append("div")
+          .attr("class", "chart")
+        .selectAll(".bar")
+        .data(data.cash)
+        .enter()
+        .append("div")
+          .attr("class", "bar")
+          .style("width", function (d) {return d.count/100 + "px"})
+          .style("outline", "1px solid black")
+          .text(function (d) {return Math.round(d.count)});
+    }
+    </script>
+</head>
+<body>
+  <script>
+    // Make an HTTP GET request to a JSON file at the URL,
+    // then call the function draw() with that data
+    d3.json("data/service_status.json", draw);
+  </script>
+</body>
+</html>
