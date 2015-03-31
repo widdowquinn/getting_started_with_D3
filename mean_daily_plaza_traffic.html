@@ -21,6 +21,17 @@
       text-align:right;
       margin-left:22em;
     }
+    // Styling for labels. float:left puts bars to the right,
+    // and fixing label width makes bars line up.
+    div.label {
+      height:3em;
+      line-height:3em;
+      padding-right:1em;
+      margin-bottom:2px;
+      float:left;
+      width:20em;
+      text-align:right;
+    }
   </style>
   <script>
     // A draw() function that visualises passed data
@@ -31,24 +42,34 @@
       // Select the BODY, and append a <div>, whose class is 
       // "chart" - the styles relevant to charts can then be
       // selected and applied.
-      // The .selectAll() of "bar" is an empty selection that 
-      // is joined to the data (data.cash), with one element
-      // per datapoint.
+      // The .selectAll() of "div.line" gives us the row of each
+      // bar chart element, joined to the data (data.cash), with
+      // one element per datapoint. The data is passed down to
+      // children of this selection.
+      d3.select("body")
+        .append("div")
+          .attr("class", "chart")
+        .selectAll("div.line")
+        .data(data.cash)
+        .enter()
+        .append("div")
+          .attr("class", "line")
+      // Append a label to each line:
+      // This carries the data .name attribute
+      d3.selectAll("div.line")
+	.append("div")
+	  .attr("class", "label")
+	  .text(function (d) {return d.name});
+      // Append a bar to each line:
       // The <div> tags of class "bar" are appended, with width
       // and text elements defined according to the callbacks, 
       // and these are operating on the data's count property.
       // Scaling is kind of ad hoc, dividing the values through
       // by 100.
-      d3.select("body")
-        .append("div")
-          .attr("class", "chart")
-        .selectAll(".bar")
-        .data(data.cash)
-        .enter()
-        .append("div")
-          .attr("class", "bar")
+      d3.selectAll("div.line")
+	.append("div")
+	.attr("class", "bar")
           .style("width", function (d) {return d.count/100 + "px"})
-          .style("outline", "1px solid black")
           .text(function (d) {return Math.round(d.count)});
     }
     </script>
