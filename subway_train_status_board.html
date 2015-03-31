@@ -35,6 +35,18 @@
           .text(function (d) {
             return d.name + ": " + d.status;
           });
+      // Once the list is drawn, the code below modifies the 
+      // font weight of datapoints depending whether they are
+      // "GOOD SERVICE". This is possible because the datapoints
+      // remain associated with their corresponding elements.
+      d3.selectAll("li")
+        .style("font-weight", function (d) {
+          if (d.status == "GOOD SERVICE") {
+            return "normal";
+          } else {
+            return "bold";
+          }
+        })
     }
     </script>
 </head>
