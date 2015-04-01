@@ -26,6 +26,8 @@
 				      .data(data.nodes)
 				      .enter()
 				      .append("circle")
+				        .style("fill", "green")
+				        .style("opacity", 0.4)
 				        .attr("class", "node")
 				        .attr("r", 12);
 			var link = svg.selectAll("line.link")
