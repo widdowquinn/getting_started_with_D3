@@ -12,6 +12,56 @@
 		function draw(data) {
 			"use strict";
 			
+			/* Use a histogram layout to plot the distribution of interarrival 
+			   times. We set bin range between 1.5 and 23, step size 2.2; also
+			   we plot normalised values, not counts/frequencies.
+			   Without the .bins() method, Sturges' formula is used. With the bins
+			   we are forcing the same bins on every subway line.
+			 */
+			var histogram = d3.layout.histogram()
+				                 .bins(d3.range(1.5, 23, 2.2))
+				                 .frequency(false);
+
+			/* The counts dataset then has lower bound x, width dx, and height y
+			   of each bar in the histogram
+			 */
+			var counts = data.map(
+				function (d) {
+					return histogram(d.interarrival_times)
+				}
+			);
+
+			/* Stack the bars on top of each other */
+			var stack = d3.layout.stack();
+
+			/* Add the elements */
+			svg.selectAll("g")
+				.data(stack(counts))
+				.enter()
+				.append("g")
+				  .attr("class", function (d, i) {
+					  return lines[i]
+				  })
+				.selectAll("rect")
+				.data(function (d) {
+					return d
+				  })
+				.enter()
+				.append("rect")
+				  .attr("x", function (d) {
+					  return x_scale(d.x)
+				  })
+				  .attr("y", function (d) {
+					  return count_scale(d.y) -
+					         (height - margin - count_scale(d.y0))
+				  })
+				  .attr("width", function (d) {
+					  return x_scale(d.x + d.dx) - x_scale(d.x)
+				  })
+				  .attr("height", function (d) {
+					  return height - margin - count_scale(d.y)
+				  })
+				
 		}
 		</script>
 	</head>
