@@ -208,7 +208,9 @@
 			g.append("path")
 				.attr("d", line(data));
 
-			/* Add circles for each datapoint */
+			/* Add circles for each datapoint, delaying their entry with a
+			   transition, to imply interactivity.
+			 */
 			g.selectAll("circle")
 				.data(data)
 				.enter()
@@ -219,7 +221,23 @@
 				  .attr("cy", function (d) {
 					  return percent_scale(d.late_percent)
 						  })
-				  .attr("r", 5);
+				  .attr("r", 0);
+			/* To bring in circles from first datapoint to last, on a line:
+			   - the .delay() transition method delays transition of each circle
+			   from 0px to 5px radius by a certain amount.
+			   - for each circle/datapoint, there is an associated index (i)
+			   - using i as a numerator, the total time to display all datapoints
+			     is 1000ms (1s), and the gap between successive points is
+			     1/data.length (i.e. 1/number of points)
+			   This works well here because the data is ordered...
+			 */
+			var enter_duration = 1000;
+			g.selectAll("circle")
+				.transition()
+				.delay(function (d, i) {
+					return i / data.length * enter_duration;
+					})
+				.attr("r", 5);
 
 			/* Add mouseover event handler to each circle element. Mouseover
 			   grows the circle. Mouseout shrinks it back.
