@@ -12,12 +12,67 @@
 		function draw(data) {
 			"use strict";
 			
+			/* Layout node circles and link edges.
+			   There is, initially, no location information for nodes or
+			   edges.
+			 */
+			var width = 1500,
+				height = 1500;
+			var svg = d3.select("body")
+				    .append("svg")
+				      .attr("width", width)
+				      .attr("height", height);
+			var node = svg.selectAll("circle.node")
+				      .data(data.nodes)
+				      .enter()
+				      .append("circle")
+				        .attr("class", "node")
+				        .attr("r", 12);
+			var link = svg.selectAll("line.link")
+				      .data(data.links)
+				      .enter()
+				      .append("line")
+				        .style("stroke", "black");
+
+			/* Add a force-directed layout to the nodes and links.
+			   The layout algorithm generates a tick event, corresponding to
+			   a 'step' of the algorithm. The .on() method listens for ticks,
+			   and is used to update the positions of nodes and edges.
+			 */
+			var force = d3.layout.force()
+				      .charge(-120)
+				      .linkDistance(30)
+				      .size([width, height])
+				      .nodes(data.nodes)
+				      .links(data.links)
+				      .start();
+			force.on("tick", function() {
+				    link.attr("x1", function (d) {
+					        return d.source.x;
+				        })
+					.attr("y1", function(d) {
+						return d.source.y;
+					})
+					.attr("x2", function(d) {
+						return d.target.x;
+					})
+					.attr("y2", function(d) {
+						return d.target.y;
+					});
+				    node.attr("cx", function (d) {
+					        return d.x;
+				        })
+					.attr("cy", function (d) {
+						return d.y;
+					})
+			});
+
+			/* Allow node dragging */
+			node.call(force.drag);
 		}
 		</script>
 	</head>
 	<body>
-		<div id="timeseries"></div>
-		<div id="key"></div>
 		<script>
 		/* Make an HTTP GET request to a JSON file at the URL,
 		   then call the function draw() with that data
