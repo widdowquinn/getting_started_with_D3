@@ -12,6 +12,14 @@
 		function draw(data) {
 			"use strict";
 			
+			/* Layout settings */
+			var width = 800,
+				height = 300,
+				margin = 50;
+
+			/* Stack histogram bars on top of each other */
+			var stack = d3.layout.stack();
+
 			/* Use a histogram layout to plot the distribution of interarrival 
 			   times. We set bin range between 1.5 and 23, step size 2.2; also
 			   we plot normalised values, not counts/frequencies.
@@ -22,6 +30,11 @@
 				                 .bins(d3.range(1.5, 23, 2.2))
 				                 .frequency(false);
 
+			/* Lines */
+			var lines = data.map(function (d) {
+				return "Line_" + d.route_id
+			});
+
 			/* The counts dataset then has lower bound x, width dx, and height y
 			   of each bar in the histogram
 			 */
@@ -31,8 +44,43 @@
 				}
 			);
 
-			/* Stack the bars on top of each other */
-			var stack = d3.layout.stack();
+			/* nested_stat */
+			function nested_stat(d, stat, accessor) {
+				return stat(counts, function (d) {
+					return stat(d.map(accessor))
+				})
+			}
+
+			/* Make scales */
+			var max_count = 2;
+			var count_scale = d3.scale.linear()
+				                  .domain([0, max_count])
+				                  .range([height - margin, margin])
+				                  .nice();
+			var x_scale = d3.scale.linear()
+				              .domain([nested_stat(counts, d3.min, 
+					                 function (di) {
+					                     return di.x
+							 }),
+						       nested_stat(counts, d3.max,
+							 function (di) {
+							     return di.x
+							 })
+					               ])
+				.range([margin, width]);
+
+			/* Make axes */
+			var xaxis = d3.svg.axis()
+				          .scale(x_scale),
+			    yaxis = d3.svg.axis()
+				          .scale(count_scale)
+				          .orient("left");
+
+			/* Make the SVG canvas */
+			var svg = d3.select("body")
+				    .append("svg")
+				      .attr("width", width)
+				      .attr("height", height);
 
 			/* Add the elements */
 			svg.selectAll("g")
@@ -61,6 +109,13 @@
 				  .attr("height", function (d) {
 					  return height - margin - count_scale(d.y)
 				  })
+			svg.append("g")
+			     .attr("transform", "translate(0," + (height - margin) + ")")
+			     .call(xaxis)
+			svg.append("text")
+			     .attr("x", x_scale(10))
+			     .attr("y", height - margin / 5)
+			     .text("scheduled waiting time (minutes)")
 				
 		}
 		</script>
