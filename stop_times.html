@@ -5,8 +5,20 @@
 		<script type="text/javascript" src="d3.js">
 		/* Gives access to D3 methods */
 		</script>
+		<!-- Colour elements by train line -->
+		<link rel="stylesheet" type="text/css" href="train_colours.css" />
 		<style>
 		/* Styles that override external CSS go here */
+		rect {
+			stroke: none;
+		}
+		line {
+			stroke: black;
+		}
+		path {
+			stroke: black;
+			fill: none;
+		}
 		</style>
 		<script>
 		function draw(data) {
