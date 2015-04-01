@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <script type="text/javascript" src="d3.js">
-    // Gives access to D3 methods
+    /* Gives access to D3 methods */
   </script>
   <style>
-    // Styles that override external CSS go here
+    /* Styles that override external CSS go here */
     body{
         font-family:sans-serif;
         font-size:0.7em;
@@ -48,17 +48,18 @@
     }
   </style>
   <script>
-    // Make the axes scales global
+    /* Make the axes scales global */
     var time_scale, percent_scale;
 
-    // A draw() function that visualises passed data
+    /* A draw() function that visualises passed data */
     function draw(data) {
       "use strict"; // We want to satisfy JSLint
 
-      // Set up SVG port, defining dimensions of container, and chart.
-      // Then add SVG element, followed by group element.
-      // Assign selection of the g element to the chart variable, so
-      // we do not have to reselect the chart group for new elements.
+      /* Set up SVG port, defining dimensions of container, and chart.
+         Then add SVG element, followed by group element.
+         Assign selection of the g element to the chart variable, so
+         we do not have to reselect the chart group for new elements.
+      */
       var container_dimensions = {width:900,
                                   height:400},
           margins = {top: 10, right: 20,
@@ -76,10 +77,11 @@
                                          margins.top + ")")
                       .attr("id", "chart");
     
-      // Set up scales and axes - manually set the scale domains, rather than
-      // use data set extents (we know these ahead of time, and need to frame
-      // time series consistently). As time_scale and percent_scale have been
-      // declared globally, they do not need the var keyword, here.
+      /* Set up scales and axes - manually set the scale domains, rather than
+         use data set extents (we know these ahead of time, and need to frame
+         time series consistently). As time_scale and percent_scale have been
+         declared globally, they do not need the var keyword, here.
+      */
       time_scale = d3.time.scale()
                      .range([0, chart_dimensions.width])
                      .domain([new Date(2009, 0, 1), new Date(2011, 3, 1)]);
@@ -106,13 +108,14 @@
             .attr("x", container_dimensions.height/2)
             .attr("y", 50);
 
-      // Construct the key
-      // Use the passed data to create one new key_line per
-      // data line_id.
-      // NOTE: The "id" attribute given in the textbook code
-      // results in a clash with that of the timeseries that
-      // would be drawn (given that code). Without the change
-      // below, the code as given does not work.
+      /* Construct the key
+         Use the passed data to create one new key_line per
+         data line_id.
+         NOTE: The "id" attribute given in the textbook code
+         results in a clash with that of the timeseries that
+         would be drawn (given that code). Without the change
+         below, the code as given does not work.
+      */
       var key_items = d3.select("#key")
                         .selectAll("div")
                         .data(data)
@@ -122,8 +125,9 @@
                           .attr("id", function (d) {
                                          return d.line_id + "_key"
                                          });
-       // Then hang further elements from key_line elements, with
-       // unique IDs
+       /* Then hang further elements from key_line elements, with
+          unique IDs
+       */
        key_items.append("div")
                    .attr("id", function (d) {
                                  return "key_square_" + d.line_id
@@ -135,28 +139,30 @@
                            return d.line_name
                            });
 
-       // Add click event handler to each .key_line element. This will
-       // call get_timeseries_data() to toggle the timeseries plot on
-       // and off, for that line.
-       // If the line is not drawn, then ts.empty() returns True
-       // ts.remove will remove all elements in the timeseries plot ts.
+       /* Add click event handler to each .key_line element. This will
+          call get_timeseries_data() to toggle the timeseries plot on
+          and off, for that line.
+          If the line is not drawn, then ts.empty() returns True
+          ts.remove will remove all elements in the timeseries plot ts.
+       */
        d3.selectAll(".key_line")
            .on("click", get_timeseries_data);
     }
 
-    // Callback function that checks whether a line exists on the
-    // chart, and filters the JSON data accordingly
-    // NOTE: As above, the textbook code does not produce a
-    // working UI with the code as written. Firstly, the function
-    // prototype in the textbook is lacking any arguments; secondly
-    // the "id" attribute being selected in the textbook would not
-    // result in a line being drawn, so this needs to be changed to
-    // match the "id" attribute assigned in the draw_timeseries()
-    // function.
+    /* Callback function that checks whether a line exists on the
+       chart, and filters the JSON data accordingly
+       NOTE: As above, the textbook code does not produce a
+       working UI with the code as written. Firstly, the function
+       prototype in the textbook is lacking any arguments; secondly
+       the "id" attribute being selected in the textbook would not
+       result in a line being drawn, so this needs to be changed to
+       match the "id" attribute assigned in the draw_timeseries()
+       function.
+    */
     function get_timeseries_data(d, i) {
-      // Get id of current element
+      /* Get id of current element */
       var id = d.line_id
-      // Is there an associated timeseries plot?
+      /* Is there an associated timeseries plot? */
       var ts = d3.select("#" + id);
       if (ts.empty()) {
         d3.json("data/subway_wait.json", function(data) {
@@ -169,13 +175,14 @@
       }
     }
 
-    // Function to draw timeseries data
-    // NOTE: The "id" attribute assigned to the timeseries here
-    // in the textbook does not result in the line being drawn.
-    // The "id" has been modified to match that specified in
-    // get_timeseries_data()
+    /* Function to draw timeseries data
+       NOTE: The "id" attribute assigned to the timeseries here
+       in the textbook does not result in the line being drawn.
+       The "id" has been modified to match that specified in
+       get_timeseries_data()
+    */
     function draw_timeseries(data, id) {
-      // Path generator for timeseries
+      /* Path generator for timeseries */
       var line = d3.svg.line()
                        .x(function (d) {
                             return time_scale(d.time)
@@ -185,13 +192,13 @@
                             })
                        .interpolate("linear");
 
-      // Add a new element to the chart, for this timeseries
+      /* Add a new element to the chart, for this timeseries */
       var g = d3.select("#chart")
                 .append("g")
                   .attr("id", id)
                   .attr("class", "timeseries " + id);
 
-      // Add the path to the new timeseries element
+      /* Add the path to the new timeseries element */
       g.append("path")
          .attr("d", line(data));
     }
@@ -201,8 +208,9 @@
   <div id="timeseries"></div>
   <div id="key"></div>
   <script>
-    // Make an HTTP GET request to a JSON file at the URL,
-    // then call the function draw() with that data
+    /* Make an HTTP GET request to a JSON file at the URL,
+       then call the function draw() with that data
+    */
     d3.json("data/subway_wait_mean.json", draw);
   </script>
 </body>
