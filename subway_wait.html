@@ -109,6 +109,10 @@
       // Construct the key
       // Use the passed data to create one new key_line per
       // data line_id.
+      // NOTE: The "id" attribute given in the textbook code
+      // results in a clash with that of the timeseries that
+      // would be drawn (given that code). Without the change
+      // below, the code as given does not work.
       var key_items = d3.select("#key")
                         .selectAll("div")
                         .data(data)
@@ -142,10 +146,16 @@
 
     // Callback function that checks whether a line exists on the
     // chart, and filters the JSON data accordingly
+    // NOTE: As above, the textbook code does not produce a
+    // working UI with the code as written. Firstly, the function
+    // prototype in the textbook is lacking any arguments; secondly
+    // the "id" attribute being selected in the textbook would not
+    // result in a line being drawn, so this needs to be changed to
+    // match the "id" attribute assigned in the draw_timeseries()
+    // function.
     function get_timeseries_data(d, i) {
       // Get id of current element
       var id = d.line_id
-      console.log("get_timeseries_data() " + id)
       // Is there an associated timeseries plot?
       var ts = d3.select("#" + id);
       if (ts.empty()) {
@@ -160,8 +170,11 @@
     }
 
     // Function to draw timeseries data
+    // NOTE: The "id" attribute assigned to the timeseries here
+    // in the textbook does not result in the line being drawn.
+    // The "id" has been modified to match that specified in
+    // get_timeseries_data()
     function draw_timeseries(data, id) {
-      console.log(id)
       // Path generator for timeseries
       var line = d3.svg.line()
                        .x(function (d) {
